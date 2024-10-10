@@ -34,7 +34,14 @@ int main(void)
     /* Error */
   }
   DebugPrintAllTokens(&lexer);
+
+  FILE* fp = fopen("test.out", "w");
+  for (int i = 0; i < lexer.numOfTokens; ++i)
+  {
+    fputc(lexer.tokens[i].token, fp);
+  }
+  fclose(fp);
   
-  FreeLexer(&lexer);
+  free_lexer(&lexer);
   return 0;
 }

@@ -6,6 +6,19 @@
 
 #define HX_JSON_LEXER_PREALLOC_TOKENS 1024
 
+static void pushTokenAt(struct hx_json_lexer* lexer, enum HX_JSON_TOKEN token, unsigned int pos)
+{
+  if (lexer->numOfTokens == lexer->nAllocatedMemory)
+  {
+    lexer->nAllocatedMemory *= 2;
+    lexer->tokens = realloc(lexer->tokens, lexer->nAllocatedMemory);
+  }
+
+  lexer->tokens[lexer->numOfTokens].token = token;
+  lexer->tokens[lexer->numOfTokens].pos = pos;
+  ++lexer->numOfTokens;
+}
+
 int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
 {
   FILE* fp = fopen(jsonFileName, "r");
@@ -28,6 +41,7 @@ int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
   lexer->tokens = malloc(HX_JSON_LEXER_PREALLOC_TOKENS * sizeof(struct hx_json_token));
   lexer->tokens[0].token = HX_JSON_TOKEN_EMPTY;
   lexer->numOfTokens = 0;
+  lexer->nAllocatedMemory = HX_JSON_LEXER_PREALLOC_TOKENS;
 
 
   /* TODO: Fix Out of bound read in all accumulations */
@@ -43,78 +57,60 @@ int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
     /* Brackets */
     if (c == '{')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_LCURLY;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_LCURLY, i);
     } 
     else if (c == '}')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_RCURLY;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_RCURLY, i);
     }
     else if (c == '[')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_LBRACK;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_LBRACK, i);
     }
     else if (c == ']')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_RBRACK;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_RBRACK, i);
     }
 
     /* Strings */
     if (c == '"')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_QUOTE;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_QUOTE, i);
 
       /* Find the ending quote */
       while (text[i+j] != '"' || text[i+j-1] == '\\')
         ++j;
 
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_QUOTE;
-      lexer->tokens[lexer->numOfTokens].pos = i+j;
+      pushTokenAt(lexer, HX_JSON_TOKEN_QUOTE, i+j);
       j += 1;
-
-      ++lexer->numOfTokens;
     }
 
     if (c == ':')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_COLON;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_COLON, i);
     }
 
     if (c == ',')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_COMMA;
-      lexer->tokens[lexer->numOfTokens].pos = i;
-      ++lexer->numOfTokens;
+      pushTokenAt(lexer, HX_JSON_TOKEN_COMMA, i);
     }
 
     /* Numbers */
     if ((c >= '0' && c <= '9') || c == '-')
     {
-      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_INT;
-      lexer->tokens[lexer->numOfTokens].pos = i;
+      enum HX_JSON_TOKEN numberToken = HX_JSON_TOKEN_INT;
       /* JSON format supports exponents */
         while (text[i+j] >= '0' && text[i+j] <= '9'
             || text[i+j] == 'E' || text[i+j] == 'e' || text[i+j] == '+' || text[i+j] == '.')
         {
           /* if these exist, it's a floating point number instead */
           if (text[i+j] == 'E' || text[i+j] == 'e' || text[i+j] == '.')
-            lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_FLOAT;
+            numberToken = HX_JSON_TOKEN_FLOAT;
 
           ++j;
         }
 
-      ++lexer->numOfTokens;
+        pushTokenAt(lexer, numberToken, i);
     }
 
     /* Booleans */
@@ -125,10 +121,8 @@ int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
       /* FIXME: could read out of bounds */
       if (strncmp(text+i, strtrue, 4) == 0 || strncmp(text+i, strfalse, 4) == 0)
       {
-        lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_BOOL;
-        lexer->tokens[lexer->numOfTokens].pos = i;
+        pushTokenAt(lexer, HX_JSON_TOKEN_BOOL, i);
         j = 4;
-        ++lexer->numOfTokens;
       }
     }
 
@@ -138,14 +132,10 @@ int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
       static const char* strnull = "null";
       if (strncmp(text+i, strnull, 4) == 0)
       {
-        lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_NULL;
-        lexer->tokens[lexer->numOfTokens].pos = i;
+        pushTokenAt(lexer, HX_JSON_TOKEN_NULL, i);
         j = 4;
-
-        ++lexer->numOfTokens;
       }
     }
-
 
     i += j;
   }
@@ -161,7 +151,7 @@ void DebugPrintAllTokens(struct hx_json_lexer* lexer)
   }
 }
 
-void FreeLexer(struct hx_json_lexer* lexer)
+void free_lexer(struct hx_json_lexer* lexer)
 {
   free(lexer->tokens);
 }
