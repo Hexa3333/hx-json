@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "lexer.h"
+#include "parser.h"
 
 char* read_all(const char* fPath);
 
@@ -10,11 +12,11 @@ int main(void)
   struct hx_json_lexer lexer;
   char* text = read_all("test.json");
 
-  if (hx_json_lex(text, &lexer))
+  struct hx_json_parser parser;
+  if (hx_json_parse(text, &lexer, &parser))
   {
     /* Error */
   }
-  DebugPrintAllTokens(&lexer);
 
   FILE* fp = fopen("test.out", "w");
   for (int i = 0; i < lexer.numOfTokens; ++i)
@@ -23,6 +25,5 @@ int main(void)
   }
   fclose(fp);
   
-  free_lexer(&lexer);
   return 0;
 }
