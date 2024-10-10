@@ -39,8 +39,6 @@ int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
     /* Common accumulator */
     int j = 1;
 
-
-
     /* FIXME: no bound checking */
     /* Brackets */
     if (c == '{')
@@ -73,16 +71,16 @@ int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
     {
       lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_QUOTE;
       lexer->tokens[lexer->numOfTokens].pos = i;
+      ++lexer->numOfTokens;
 
-      /* FIXME: no bound checking */
-      /* accumulate up to the ", if there's a backslash it's an escape sequence */
+      /* Find the ending quote */
       while (text[i+j] != '"' || text[i+j-1] == '\\')
-      {
         ++j;
-      }
 
-      // Trim the string off
+      lexer->tokens[lexer->numOfTokens].token = HX_JSON_TOKEN_QUOTE;
+      lexer->tokens[lexer->numOfTokens].pos = i+j;
       j += 1;
+
       ++lexer->numOfTokens;
     }
 
