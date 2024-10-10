@@ -32,11 +32,12 @@ struct hx_json_lexer
 {
   struct hx_json_token* tokens;
   size_t numOfTokens;
+  size_t nAllocatedMemory;
 };
 
 /* Returns 0 on success */
 int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer);
 void DebugPrintAllTokens(struct hx_json_lexer* lexer);
-void FreeLexer(struct hx_json_lexer* lexer);
+void free_lexer(struct hx_json_lexer* lexer);
 
 #endif // HX_LEXER_H

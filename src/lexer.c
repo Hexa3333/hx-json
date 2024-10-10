@@ -5,6 +5,7 @@
 #include "lexer.h"
 
 #define HX_JSON_LEXER_PREALLOC_TOKENS 1024
+char* read_all(const char* fPath);
 
 static void pushTokenAt(struct hx_json_lexer* lexer, enum HX_JSON_TOKEN token, unsigned int pos)
 {
@@ -21,21 +22,7 @@ static void pushTokenAt(struct hx_json_lexer* lexer, enum HX_JSON_TOKEN token, u
 
 int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer)
 {
-  FILE* fp = fopen(jsonFileName, "r");
-  if (fp == NULL)
-  {
-    perror(jsonFileName);
-    return -1;
-  }
-  fseek(fp, 0, SEEK_END);
-  size_t jsonFileLength = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-
-  /* Load file into memory */
-  char* text = malloc(jsonFileLength);
-  fread(text, 1, jsonFileLength, fp);
-  text[jsonFileLength] = 0;
-  fclose(fp);
+  char* text = read_all(jsonFileName);
 
   /* I should probably dynamically realloc */
   lexer->tokens = malloc(HX_JSON_LEXER_PREALLOC_TOKENS * sizeof(struct hx_json_token));
