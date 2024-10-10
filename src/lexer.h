@@ -36,7 +36,7 @@ struct hx_json_lexer
 };
 
 /* Returns 0 on success */
-int hx_json_lex(const char* jsonFileName, struct hx_json_lexer* lexer);
+int hx_json_lex(char* text, struct hx_json_lexer* lexer);
 void DebugPrintAllTokens(struct hx_json_lexer* lexer);
 void free_lexer(struct hx_json_lexer* lexer);
 

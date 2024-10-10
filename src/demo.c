@@ -3,10 +3,14 @@
 #include <string.h>
 #include "lexer.h"
 
+char* read_all(const char* fPath);
+
 int main(void)
 {
   struct hx_json_lexer lexer;
-  if (hx_json_lex("test.json", &lexer))
+  char* text = read_all("test.json");
+
+  if (hx_json_lex(text, &lexer))
   {
     /* Error */
   }
