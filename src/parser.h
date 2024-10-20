@@ -1,8 +1,8 @@
 #ifndef HX_JSON_PARSER_H
 #define HX_JSON_PARSER_H
 
-#define HX_JSON_STR_MAXLEN 128
-#define HX_JSON_CHILD_MAX 64
+#define HX_JSON_STR_MAXLEN 256
+#define HX_JSON_MAX_DEPTH 64
 #define HX_JSON_ARRAY_MAXLEN 64
 #define HX_JSON_NODES_MAXLEN 64
 
@@ -28,11 +28,11 @@ union hx_json_type
 struct hx_json_node
 {
   char key[HX_JSON_STR_MAXLEN];
+  struct hx_json_node* parent;
   union
   {
     union hx_json_type value;
     union hx_json_type array[HX_JSON_ARRAY_MAXLEN];
-    struct hx_json_node* child;
   };
 };
 
