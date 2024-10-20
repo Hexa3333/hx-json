@@ -22,6 +22,8 @@ int main(void)
     fputc(lexer.tokens[i].token, fp);
   }
   fclose(fp);
+
+  free_lexer(&lexer);
   free(text);
   
   return 0;

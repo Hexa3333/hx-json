@@ -16,7 +16,6 @@ char* read_all(const char* fPath)
   /* Load file into memory */
   char* text = malloc(fileLength);
   fread(text, 1, fileLength, fp);
-  text[fileLength] = 0;
   fclose(fp);
 
   return text;

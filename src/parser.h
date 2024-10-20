@@ -4,11 +4,12 @@
 #define HX_JSON_STR_MAXLEN 128
 #define HX_JSON_CHILD_MAX 64
 #define HX_JSON_ARRAY_MAXLEN 64
-#define HX_JSON_ROOTNODES_MAXLEN 64
+#define HX_JSON_NODES_MAXLEN 64
 
 #include <stdbool.h>
 #include "lexer.h"
 
+/* TODO: enlarge into 64 bits */
 union hx_json_type
 {
   char str[HX_JSON_STR_MAXLEN];
@@ -31,14 +32,14 @@ struct hx_json_node
   {
     union hx_json_type value;
     union hx_json_type array[HX_JSON_ARRAY_MAXLEN];
-    struct hx_json_node** child;
+    struct hx_json_node* child;
   };
 };
 
 struct hx_json_parser
 {
-  struct hx_json_node rootNodes[HX_JSON_ROOTNODES_MAXLEN];
-  unsigned int numOfRootNodes;
+  struct hx_json_node nodes[HX_JSON_NODES_MAXLEN];
+  unsigned int numOfNodes;
 };
 
 int hx_json_parse(const char* text, const struct hx_json_lexer* lexer, struct hx_json_parser* parser);
