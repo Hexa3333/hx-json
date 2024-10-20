@@ -21,7 +21,6 @@ static void pushTokenAt(struct hx_json_lexer* lexer, enum HX_JSON_TOKEN token, u
 
 int hx_json_lex(char* text, struct hx_json_lexer* lexer)
 {
-  /* I should probably dynamically realloc */
   lexer->tokens = malloc(HX_JSON_LEXER_PREALLOC_TOKENS * sizeof(struct hx_json_token));
   lexer->tokens[0].token = HX_JSON_TOKEN_EMPTY;
   lexer->numOfTokens = 0;

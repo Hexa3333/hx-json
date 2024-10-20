@@ -10,13 +10,11 @@ char* read_all(const char* fPath);
 int main(void)
 {
   struct hx_json_lexer lexer;
-  char* text = read_all("test.json");
-
   struct hx_json_parser parser;
-  if (hx_json_parse(text, &lexer, &parser))
-  {
-    /* Error */
-  }
+
+  char* text = read_all("test.json");
+  hx_json_lex(text, &lexer);
+  hx_json_parse(text, &lexer, &parser);
 
   FILE* fp = fopen("test.out", "w");
   for (int i = 0; i < lexer.numOfTokens; ++i)
@@ -24,6 +22,7 @@ int main(void)
     fputc(lexer.tokens[i].token, fp);
   }
   fclose(fp);
+  free(text);
   
   return 0;
 }
