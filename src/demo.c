@@ -6,6 +6,7 @@
 #include "parser.h"
 
 char* read_all(const char* fPath);
+void test();
 
 int main(void)
 {
@@ -15,6 +16,8 @@ int main(void)
   char* text = read_all("test.json");
   hx_json_lex(text, &lexer);
   hx_json_parse(text, &lexer, &parser);
+
+  //test();
 
   FILE* fp = fopen("test.out", "w");
   for (int i = 0; i < lexer.numOfTokens; ++i)

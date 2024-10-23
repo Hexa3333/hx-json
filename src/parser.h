@@ -26,7 +26,7 @@ union hx_json_type
 */
 struct hx_json_node
 {
-  char parent[HX_JSON_STR_MAXLEN];
+  char key[HX_JSON_STR_MAXLEN];
   union hx_json_type values[HX_JSON_ARRAY_MAXLEN];
 };
 
