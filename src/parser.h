@@ -1,8 +1,10 @@
 #ifndef HX_JSON_PARSER_H
 #define HX_JSON_PARSER_H
 
+/* TODO: Got work to do here */
+/* includes depth */
 #define HX_JSON_STR_MAXLEN 256
-#define HX_JSON_MAX_DEPTH 64
+#define HX_JSON_DEPTH_MAXLEN 32
 #define HX_JSON_ARRAY_MAXLEN 64
 #define HX_JSON_NODES_MAXLEN 64
 
@@ -19,21 +21,13 @@ union hx_json_type
 };
 
 /*
- * key: the identifier string
- * union:
- *    value: a json value
- *    value: an array of json values
- *    children: a pointer to a child node
+ * parent: the identifier string
+ * values: a list of json values
 */
 struct hx_json_node
 {
-  char key[HX_JSON_STR_MAXLEN];
-  struct hx_json_node* parent;
-  union
-  {
-    union hx_json_type value;
-    union hx_json_type array[HX_JSON_ARRAY_MAXLEN];
-  };
+  char parent[HX_JSON_STR_MAXLEN];
+  union hx_json_type values[HX_JSON_ARRAY_MAXLEN];
 };
 
 struct hx_json_parser
