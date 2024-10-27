@@ -1,30 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
 #include "lexer.h"
-#include "parser.h"
 
-char* read_all(const char* fPath);
-void test();
+char* read_all(const char* fPath)
+{
+  FILE* fp = fopen(fPath, "r");
+  if (fp == NULL)
+  {
+    perror(fPath);
+    return "";
+  }
+  fseek(fp, 0, SEEK_END);
+  size_t fileLength = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+
+  /* Load file into memory */
+  char* text = malloc(fileLength);
+  fread(text, 1, fileLength, fp);
+  fclose(fp);
+
+  return text;
+}
 
 int main(void)
 {
   struct hx_json_lexer lexer;
-  struct hx_json_parser parser;
 
   char* text = read_all("test.json");
   hx_json_lex(text, &lexer);
-  hx_json_parse(text, &lexer, &parser);
 
-  //test();
-
-  FILE* fp = fopen("test.out", "w");
+  printf("Shadowprint:\n");
   for (int i = 0; i < lexer.numOfTokens; ++i)
   {
-    fputc(lexer.tokens[i].token, fp);
+    printf("%c", lexer.tokens[i].token);
   }
-  fclose(fp);
+  printf("\n");
 
   free_lexer(&lexer);
   free(text);
