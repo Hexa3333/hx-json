@@ -8,7 +8,33 @@ struct hx_json_token GetNextToken(struct hxjson* json)
   return json->lexer.tokens[json->curTokenIndex++];
 }
 
-/* Namespace */
+/* Pop, preserving the last dot (if exists) */
+static void PopPreservekeyname(char* keyname)
+{
+  char* lastdot = strrchr(keyname, '.');
+  if (lastdot)
+  {
+    *(lastdot+1) = 0;
+  }
+  else *keyname = 0;
+}
+
+/* Pop, ignoring the last dot */
+static void Popkeyname(char* keyname)
+{
+  /* lastdot should always be the last el. of keyname */
+  /* This (i think) is still the smart way though */
+  char* lastdot = strrchr(keyname, '.');
+  if (lastdot)
+  {
+    *lastdot = 0;
+  }
+  else
+    *keyname = 0;
+
+  PopPreservekeyname(keyname);
+}
+
 
 struct hxjson* hxjson(char* text)
 {
@@ -44,53 +70,82 @@ struct hxjson* hxjson(char* text)
           {
             cToken = GetNextToken(ret);
             /* pop key */
-            keyname[strlen(keyname)-innerKeyLen] = 0;
+            //keyname[strlen(keyname)-innerKeyLen] = 0;
+            PopPreservekeyname(keyname);
             break;
           }
 
           case HX_JSON_TOKEN_INT:
           {
-            keyname[strlen(keyname)-innerKeyLen] = 0;
+            PopPreservekeyname(keyname);
             break;
           }
           case HX_JSON_TOKEN_FLOAT:
           {
-            keyname[strlen(keyname)-innerKeyLen] = 0;
+            PopPreservekeyname(keyname);
             break;
           }
           case HX_JSON_TOKEN_BOOL:
           {
-            keyname[strlen(keyname)-innerKeyLen] = 0;
+            PopPreservekeyname(keyname);
             break;
           }
           case HX_JSON_TOKEN_NULL:
           {
-            keyname[strlen(keyname)-innerKeyLen] = 0;
+            PopPreservekeyname(keyname);
             break;
           }
+
+          case HX_JSON_TOKEN_LBRACK:
+          {
+            Q1 = cToken.pos;            
+            while ((cToken = GetNextToken(ret)).token != HX_JSON_TOKEN_RBRACK) {}
+            Q2 = cToken.pos;
+
+            char buf[512];
+            int buflen = Q2-Q1 +1;
+            strncpy(buf, text + Q1, buflen);
+            buf[buflen] = 0;
+            
+            PopPreservekeyname(keyname);
+            break;
+          }
+          
 
           case HX_JSON_TOKEN_LCURLY:
           {
             strcat(keyname, ".");
             break;
           }
-
-          case HX_JSON_TOKEN_RCURLY:
-          {
-            keyname[strlen(keyname)-innerKeyLen] = 0;
-            break;
-          }
-
-
           default: break;
         }
-      }
-      else {
-        /* ERROR: missing colon */
-      }
+      } 
+    } else if (cToken.token == HX_JSON_TOKEN_RCURLY)
+    {
+      Popkeyname(keyname);
     }
-  }
-  
+    else
+    {
+      /* ERROR: missing colon */
+    }
+    }
 
   return ret;
 }
+
+
+/* 
+   The whole api internally works only with strings.
+   The strings are converted to the appropriate values
+  when hxjsonGet{Type} is called.
+   The input values are converted to strings when
+  hxJsonSet{Type} is called. (might actually make sets string only)
+   This includes arrays. The user has to create a buffer as a string
+  and only then pass hxJsonSet.
+  Ex:
+   char* names = "[ "Alan Turing", "Gordon Welchman", "Mario" ]";
+   hxJsonSet(names, obj);
+  
+
+
+*/
