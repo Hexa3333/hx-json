@@ -1,11 +1,18 @@
 #include "json.h"
+#include "lexer.h"
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-struct hx_json_token GetNextToken(struct hxjson* json)
+static struct hx_json_token GetNextToken(struct hxjson* json)
 {
   return json->lexer.tokens[json->curTokenIndex++];
+}
+
+static struct hx_json_token PeekNextToken(struct hxjson* json)
+{
+  return json->lexer.tokens[json->curTokenIndex];
 }
 
 /* Pop, preserving the last dot (if exists) */
@@ -35,6 +42,14 @@ static void Popkeyname(char* keyname)
   PopPreservekeyname(keyname);
 }
 
+static void PushValue(char* key, unsigned int Q1, unsigned int Q2, struct hxjson* json)
+{
+  strcpy(json->values[json->curValueIndex].key, key);
+  json->values[json->curValueIndex].Start = Q1;
+  json->values[json->curValueIndex].End = Q2;
+  json->curValueIndex++;
+}
+
 
 struct hxjson* hxjson(char* text)
 {
@@ -43,12 +58,14 @@ struct hxjson* hxjson(char* text)
     return NULL;
 
   ret->text = text;
+  ret->curTokenIndex = 0;
+  bzero(ret->values, sizeof(ret->values));
+  ret->curValueIndex = 0;
   if (hx_json_lex(ret->text, &ret->lexer))
   {
     /* TODO: ERR */
   }
 
-  ret->curTokenIndex = 0;
   char keyname[HX_JSON_MAX_KEYLEN] = {0};
   struct hx_json_token cToken;
   while ((cToken = GetNextToken(ret)).token)
@@ -60,7 +77,7 @@ struct hxjson* hxjson(char* text)
       int Q2 = (cToken = GetNextToken(ret)).pos;
       int innerKeyLen = Q2 - Q1 -1;
       strncat(keyname, ret->text + Q1 + 1, innerKeyLen);
-      printf("%s\n", keyname);
+      //printf("%s\n", keyname);
 
       if ((cToken = GetNextToken(ret)).token == HX_JSON_TOKEN_COLON)
       {
@@ -68,30 +85,47 @@ struct hxjson* hxjson(char* text)
         {
           case HX_JSON_TOKEN_QUOTE:
           {
-            cToken = GetNextToken(ret);
-            /* pop key */
-            //keyname[strlen(keyname)-innerKeyLen] = 0;
+            Q1 = cToken.pos+1;
+            Q2 = (cToken = GetNextToken(ret)).pos -1;
+            PushValue(keyname, Q1, Q2, ret);
+
             PopPreservekeyname(keyname);
             break;
           }
 
           case HX_JSON_TOKEN_INT:
           {
+            Q1 = cToken.pos;
+            Q2 = PeekNextToken(ret).pos-1;
+
+            PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
           }
           case HX_JSON_TOKEN_FLOAT:
           {
+            Q1 = cToken.pos;
+            Q2 = PeekNextToken(ret).pos-1;
+
+            PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
           }
           case HX_JSON_TOKEN_BOOL:
           {
+            Q1 = cToken.pos;
+            Q2 = PeekNextToken(ret).pos-1;
+
+            PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
           }
           case HX_JSON_TOKEN_NULL:
           {
+            Q1 = cToken.pos;
+            Q2 = PeekNextToken(ret).pos-1;
+
+            PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
           }
@@ -102,11 +136,7 @@ struct hxjson* hxjson(char* text)
             while ((cToken = GetNextToken(ret)).token != HX_JSON_TOKEN_RBRACK) {}
             Q2 = cToken.pos;
 
-            char buf[512];
-            int buflen = Q2-Q1 +1;
-            strncpy(buf, text + Q1, buflen);
-            buf[buflen] = 0;
-            
+            PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
           }
@@ -133,6 +163,22 @@ struct hxjson* hxjson(char* text)
   return ret;
 }
 
+/* TODO: Implement string search */
+
+char* hxjsonGet(const char* name, struct hxjson* json)
+{
+  int valLen = json->values[0].End - json->values[0].Start+1;
+  char* ret = malloc(valLen);
+  strncpy(ret, &json->text[json->values[0].Start], valLen);
+  ret[valLen] = 0;
+
+  return ret;
+}
+
+void hxjsonFree(struct hxjson* json)
+{
+  free_lexer(&json->lexer);
+}
 
 /* 
    The whole api internally works only with strings.
