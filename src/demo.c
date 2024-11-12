@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "lexer.h"
+#include "json.h"
 
 char* read_all(const char* fPath)
 {
@@ -27,16 +28,9 @@ int main(void)
   struct hx_json_lexer lexer;
 
   char* text = read_all("test.json");
-  hx_json_lex(text, &lexer);
 
-  printf("Shadowprint:\n");
-  for (int i = 0; i < lexer.numOfTokens; ++i)
-  {
-    printf("%c", lexer.tokens[i].token);
-  }
-  printf("\n");
+  struct hxjson* json = hxjson(text);
 
-  free_lexer(&lexer);
   free(text);
   
   return 0;
