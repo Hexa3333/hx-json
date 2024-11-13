@@ -1,5 +1,5 @@
-#ifndef HX_LEXER_H
-#define HX_LEXER_H
+#ifndef HXJSON_LEXER_H
+#define HXJSON_LEXER_H
 #include <stddef.h>
 
 /*
@@ -22,22 +22,21 @@ enum HX_JSON_TOKEN {
   HX_JSON_TOKEN_NULL = 'n'
 };
 
-struct hx_json_token
+struct hxjson_token
 {
   enum HX_JSON_TOKEN token;
   unsigned int pos;
 };
 
-struct hx_json_lexer
+struct hxjson_lexer
 {
-  struct hx_json_token* tokens;
+  struct hxjson_token* tokens;
   size_t numOfTokens;
   size_t nAllocatedMemory;
 };
 
 /* Returns 0 on success */
-int hx_json_lex(char* text, struct hx_json_lexer* lexer);
-void DebugPrintAllTokens(struct hx_json_lexer* lexer);
-void free_lexer(struct hx_json_lexer* lexer);
+int hxjson_lex(char* text, struct hxjson_lexer* lexer);
+void hxjsonFree_lexer(struct hxjson_lexer* lexer);
 
-#endif // HX_LEXER_H
+#endif // HXJSON_LEXER_H

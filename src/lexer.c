@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -6,7 +5,7 @@
 
 #define HX_JSON_LEXER_PREALLOC_TOKENS 1024
 
-static void pushTokenAt(struct hx_json_lexer* lexer, enum HX_JSON_TOKEN token, unsigned int pos)
+static void pushTokenAt(struct hxjson_lexer* lexer, enum HX_JSON_TOKEN token, unsigned int pos)
 {
   if (lexer->numOfTokens == lexer->nAllocatedMemory)
   {
@@ -19,9 +18,9 @@ static void pushTokenAt(struct hx_json_lexer* lexer, enum HX_JSON_TOKEN token, u
   ++lexer->numOfTokens;
 }
 
-int hx_json_lex(char* text, struct hx_json_lexer* lexer)
+int hxjson_lex(char* text, struct hxjson_lexer* lexer)
 {
-  lexer->tokens = malloc(HX_JSON_LEXER_PREALLOC_TOKENS * sizeof(struct hx_json_token));
+  lexer->tokens = malloc(HX_JSON_LEXER_PREALLOC_TOKENS * sizeof(struct hxjson_token));
   lexer->tokens[0].token = HX_JSON_TOKEN_EMPTY;
   lexer->numOfTokens = 0;
   lexer->nAllocatedMemory = HX_JSON_LEXER_PREALLOC_TOKENS;
@@ -126,15 +125,7 @@ int hx_json_lex(char* text, struct hx_json_lexer* lexer)
   return 0;
 }
 
-void DebugPrintAllTokens(struct hx_json_lexer* lexer)
-{
-  for (int i = 0; i < lexer->numOfTokens; i++)
-  {
-    printf("(%i, %c)\n", lexer->tokens[i].pos, lexer->tokens[i].token);
-  }
-}
-
-void free_lexer(struct hx_json_lexer* lexer)
+void hxjsonFree_lexer(struct hxjson_lexer* lexer)
 {
   free(lexer->tokens);
 }

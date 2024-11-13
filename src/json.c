@@ -4,13 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
-static struct hx_json_token GetNextToken(struct hxjson* json)
+static struct hxjson_token GetNextToken(struct hxjson* json)
 {
   return json->lexer.tokens[json->curTokenIndex++];
 }
 
-static struct hx_json_token PeekNextToken(struct hxjson* json)
+static struct hxjson_token PeekNextToken(struct hxjson* json)
 {
   return json->lexer.tokens[json->curTokenIndex];
 }
@@ -61,13 +62,13 @@ struct hxjson* hxjson(char* text)
   ret->curTokenIndex = 0;
   bzero(ret->values, sizeof(ret->values));
   ret->curValueIndex = 0;
-  if (hx_json_lex(ret->text, &ret->lexer))
+  if (hxjson_lex(ret->text, &ret->lexer))
   {
     /* TODO: ERR */
   }
 
   char keyname[HX_JSON_MAX_KEYLEN] = {0};
-  struct hx_json_token cToken;
+  struct hxjson_token cToken;
   while ((cToken = GetNextToken(ret)).token)
   {
     /* Get keyname */
@@ -179,7 +180,7 @@ static struct hxjson_node* hxjsonFindNode(const char* name, struct hxjson* json)
 
 
 
-
+/* TODO: Smart get (array implementation)*/
 char* hxjsonGet(const char* name, struct hxjson* json)
 {
   struct hxjson_node* val = hxjsonFindNode(name, json);
@@ -194,6 +195,12 @@ char* hxjsonGet(const char* name, struct hxjson* json)
   return ret;
 }
 
+/* NOTE: 
+  Set calls work in-memory and are only written after
+ a call to hxjsonWrite
+*/
+
+/* TODO */
 void hxjsonSet(const char* name, struct hxjson* json)
 {
   struct hxjson_node* node = hxjsonFindNode(name, json);
@@ -214,7 +221,7 @@ void hxjsonSet(const char* name, struct hxjson* json)
 
 void hxjsonFree(struct hxjson* json)
 {
-  free_lexer(&json->lexer);
+  hxjsonFree_lexer(&json->lexer);
   free(json);
 }
 

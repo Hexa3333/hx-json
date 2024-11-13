@@ -14,21 +14,27 @@ struct hxjson_node {
 };
 
 struct hxjson {
+  char* fPath;
   char* text;
-  struct hx_json_lexer lexer;
+  struct hxjson_lexer lexer;
   unsigned int curTokenIndex;
 
   struct hxjson_node values[HX_JSON_MAX_VALLEN];
   unsigned int curValueIndex;
 };
 
-struct hxjson* hxjson(char* text);
-void hxjsonFree(struct hxjson* json);
+/* TODO: Refactoring and explanation */
 
-/* TODO: API */
+struct hxjson* hxjson(char* text);
+
 char* hxjsonGet(const char* name, struct hxjson* json);
 
 /* TODO */
 void hxjsonSet(const char* name, struct hxjson* json);
+
+/* json->text!!! */
+int hxjsonWrite(struct hxjson* json);
+
+void hxjsonFree(struct hxjson* json);
 
 #endif //HX_JSON_H

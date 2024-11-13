@@ -28,9 +28,9 @@ int main(void)
   char* text = read_all("test.json");
 
   struct hxjson* json = hxjson(text);
-  char* name = hxjsonGet("hmm", json);
-  printf("%s\n", name);
-  free(name);
+  char* get = hxjsonGet("address.coordinates.latitude", json);
+  printf("%s\n", get);
+  if (get) free(get);
   
   hxjsonFree(json);
   free(text);
