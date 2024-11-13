@@ -19,22 +19,13 @@ struct hxjson {
   struct hxjson_lexer lexer;
   unsigned int curTokenIndex;
 
-  struct hxjson_node values[HXJSON_MAX_VALLEN];
-  unsigned int curValueIndex;
+  struct hxjson_node nodes[HXJSON_MAX_VALLEN];
+  unsigned int curNodeIndex;
 };
 
-/* TODO: Refactoring and explanation */
-
 struct hxjson* hxjson(char* text);
-
 char* hxjsonGet(const char* name, struct hxjson* json);
-
-/* TODO */
 void hxjsonSet(const char* name, struct hxjson* json);
-
-/* json->text!!! */
-int hxjsonWrite(struct hxjson* json);
-
 void hxjsonFree(struct hxjson* json);
 
 #endif //HXJSON_H

@@ -45,11 +45,11 @@ static void Popkeyname(char* keyname)
 
 static void PushValue(char* key, unsigned int Q1, unsigned int Q2, struct hxjson* json)
 {
-  strcpy(json->values[json->curValueIndex].key, key);
-  json->values[json->curValueIndex].Start = Q1;
-  json->values[json->curValueIndex].End = Q2;
-  json->values[json->curValueIndex].index = json->curValueIndex;
-  json->curValueIndex++;
+  strcpy(json->nodes[json->curNodeIndex].key, key);
+  json->nodes[json->curNodeIndex].Start = Q1;
+  json->nodes[json->curNodeIndex].End = Q2;
+  json->nodes[json->curNodeIndex].index = json->curNodeIndex;
+  json->curNodeIndex++;
 }
 
 struct hxjson* hxjson(char* text)
@@ -60,8 +60,8 @@ struct hxjson* hxjson(char* text)
 
   ret->text = text;
   ret->curTokenIndex = 0;
-  bzero(ret->values, sizeof(ret->values));
-  ret->curValueIndex = 0;
+  bzero(ret->nodes, sizeof(ret->nodes));
+  ret->curNodeIndex = 0;
   if (hxjson_lex(ret->text, &ret->lexer))
   {
     /* TODO: ERR */
@@ -167,11 +167,11 @@ struct hxjson* hxjson(char* text)
 /* TODO: Implement hashtable based string search ? */
 static struct hxjson_node* hxjsonFindNode(const char* name, struct hxjson* json)
 {
-  for (int i = 0; i < json->curValueIndex; ++i)
+  for (int i = 0; i < json->curNodeIndex; ++i)
   {
-    if (strcmp(name, json->values[i].key) == 0)
+    if (strcmp(name, json->nodes[i].key) == 0)
     {
-      return &json->values[i];
+      return &json->nodes[i];
     }
   }
 
@@ -227,12 +227,12 @@ void hxjsonFree(struct hxjson* json)
 
 /* 
    The whole api internally works only with strings.
-   The strings are converted to the appropriate values
+   The strings are converted to the appropriate nodes
   when hxjsonGet{Type} is called.
-   The input values are converted to strings when
+   The input nodes are converted to strings when
   hxJsonSet{Type} is called. (might actually make sets string only)
 
-   You cannot get dictionary values as a whole, but can use the...
+   You cannot get dictionary nodes as a whole, but can use the...
 
    This includes arrays. The user has to create a buffer as a string
   and only then pass hxJsonSet.
