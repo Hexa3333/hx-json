@@ -1,0 +1,61 @@
+{
+  "name": "Alice",
+  "name2": "John",
+  "name3": "Marston",
+  "bounty": 2000,
+  "actualAge": 29.7,
+  "age": 29,
+  "isStudent": false,
+  "address": {
+    "coordinates": {
+      "latitude": 31.7749,
+      "longitude": -122.4194
+    },
+    "street": "123 Maple St",
+    "city": "Springfield",
+    "postalCode": "12345"
+  },
+  "stillworks": true,
+  "arrayworks": [ 5, 3, "abc" ],
+  "favoriteNumbers": [7, 42, 3.1415, -12],
+  "hobbies": [
+    "reading",
+    "coding",
+    {
+      "type": "sports",
+      "name": "basketball",
+      "frequencyPerWeek": 3
+    }
+  ],
+  "achievements": null,
+  "preferences": {
+    "notifications": true,
+    "theme": "dark",
+    "languages": ["English", "Spanish"]
+  },
+  "balance": 1234.56,
+  "isAdmin": true,
+  "hmm": [
+    "2023-11-12T09:00:00Z",
+    "2023-10-19T14:45:00Z",
+    "2024-01-01T00:00:00Z"
+  ],
+  "contacts": [
+    {
+      "name": "Bob",
+      "relationship": "friend",
+      "contactMethods": {
+        "email": "bob@example.com",
+        "phone": null
+      }
+    },
+    {
+      "name": "Carol",
+      "relationship": "colleague",
+      "contactMethods": {
+        "email": null,
+        "phone": "123-456-7890"
+      }
+    }
+  ]
+}
