@@ -7,24 +7,24 @@
  the lexing algorithm and are only set as such
  for debugging purposes
 */
-enum HX_JSON_TOKEN {
-  HX_JSON_TOKEN_EMPTY,
-  HX_JSON_TOKEN_LCURLY = '{',
-  HX_JSON_TOKEN_RCURLY = '}',
-  HX_JSON_TOKEN_LBRACK = '[',
-  HX_JSON_TOKEN_RBRACK = ']',
-  HX_JSON_TOKEN_QUOTE = '"',
-  HX_JSON_TOKEN_COLON = ':',
-  HX_JSON_TOKEN_COMMA = ',',
-  HX_JSON_TOKEN_INT = 'i',
-  HX_JSON_TOKEN_FLOAT = 'f',
-  HX_JSON_TOKEN_BOOL = 'b',
-  HX_JSON_TOKEN_NULL = 'n'
+enum HXJSON_TOKEN {
+  HXJSON_TOKEN_EMPTY,
+  HXJSON_TOKEN_LCURLY = '{',
+  HXJSON_TOKEN_RCURLY = '}',
+  HXJSON_TOKEN_LBRACK = '[',
+  HXJSON_TOKEN_RBRACK = ']',
+  HXJSON_TOKEN_QUOTE = '"',
+  HXJSON_TOKEN_COLON = ':',
+  HXJSON_TOKEN_COMMA = ',',
+  HXJSON_TOKEN_INT = 'i',
+  HXJSON_TOKEN_FLOAT = 'f',
+  HXJSON_TOKEN_BOOL = 'b',
+  HXJSON_TOKEN_NULL = 'n'
 };
 
 struct hxjson_token
 {
-  enum HX_JSON_TOKEN token;
+  enum HXJSON_TOKEN token;
   unsigned int pos;
 };
 

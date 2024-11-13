@@ -3,9 +3,9 @@
 
 #include "lexer.h"
 
-#define HX_JSON_LEXER_PREALLOC_TOKENS 1024
+#define HXJSON_LEXER_PREALLOC_TOKENS 1024
 
-static void pushTokenAt(struct hxjson_lexer* lexer, enum HX_JSON_TOKEN token, unsigned int pos)
+static void pushTokenAt(struct hxjson_lexer* lexer, enum HXJSON_TOKEN token, unsigned int pos)
 {
   if (lexer->numOfTokens == lexer->nAllocatedMemory)
   {
@@ -20,10 +20,10 @@ static void pushTokenAt(struct hxjson_lexer* lexer, enum HX_JSON_TOKEN token, un
 
 int hxjson_lex(char* text, struct hxjson_lexer* lexer)
 {
-  lexer->tokens = malloc(HX_JSON_LEXER_PREALLOC_TOKENS * sizeof(struct hxjson_token));
-  lexer->tokens[0].token = HX_JSON_TOKEN_EMPTY;
+  lexer->tokens = malloc(HXJSON_LEXER_PREALLOC_TOKENS * sizeof(struct hxjson_token));
+  lexer->tokens[0].token = HXJSON_TOKEN_EMPTY;
   lexer->numOfTokens = 0;
-  lexer->nAllocatedMemory = HX_JSON_LEXER_PREALLOC_TOKENS;
+  lexer->nAllocatedMemory = HXJSON_LEXER_PREALLOC_TOKENS;
 
 
   /* TODO: Fix Out of bound read in all accumulations */
@@ -39,55 +39,55 @@ int hxjson_lex(char* text, struct hxjson_lexer* lexer)
     /* Brackets */
     if (c == '{')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_LCURLY, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_LCURLY, i);
     } 
     else if (c == '}')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_RCURLY, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_RCURLY, i);
     }
     else if (c == '[')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_LBRACK, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_LBRACK, i);
     }
     else if (c == ']')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_RBRACK, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_RBRACK, i);
     }
 
     /* Strings */
     if (c == '"')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_QUOTE, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_QUOTE, i);
 
       /* Find the ending quote */
       while (text[i+j] != '"' || text[i+j-1] == '\\')
         ++j;
 
-      pushTokenAt(lexer, HX_JSON_TOKEN_QUOTE, i+j);
+      pushTokenAt(lexer, HXJSON_TOKEN_QUOTE, i+j);
       j += 1;
     }
 
     if (c == ':')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_COLON, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_COLON, i);
     }
 
     if (c == ',')
     {
-      pushTokenAt(lexer, HX_JSON_TOKEN_COMMA, i);
+      pushTokenAt(lexer, HXJSON_TOKEN_COMMA, i);
     }
 
     /* Numbers */
     if ((c >= '0' && c <= '9') || c == '-')
     {
-      enum HX_JSON_TOKEN numberToken = HX_JSON_TOKEN_INT;
+      enum HXJSON_TOKEN numberToken = HXJSON_TOKEN_INT;
       /* JSON format supports exponents */
         while (text[i+j] >= '0' && text[i+j] <= '9'
             || text[i+j] == 'E' || text[i+j] == 'e' || text[i+j] == '+' || text[i+j] == '.')
         {
           /* if these exist, it's a floating point number instead */
           if (text[i+j] == 'E' || text[i+j] == 'e' || text[i+j] == '.')
-            numberToken = HX_JSON_TOKEN_FLOAT;
+            numberToken = HXJSON_TOKEN_FLOAT;
 
           ++j;
         }
@@ -103,7 +103,7 @@ int hxjson_lex(char* text, struct hxjson_lexer* lexer)
       /* FIXME: could read out of bounds */
       if (strncmp(text+i, strtrue, 4) == 0 || strncmp(text+i, strfalse, 4) == 0)
       {
-        pushTokenAt(lexer, HX_JSON_TOKEN_BOOL, i);
+        pushTokenAt(lexer, HXJSON_TOKEN_BOOL, i);
         j = 4;
       }
     }
@@ -114,7 +114,7 @@ int hxjson_lex(char* text, struct hxjson_lexer* lexer)
       static const char* strnull = "null";
       if (strncmp(text+i, strnull, 4) == 0)
       {
-        pushTokenAt(lexer, HX_JSON_TOKEN_NULL, i);
+        pushTokenAt(lexer, HXJSON_TOKEN_NULL, i);
         j = 4;
       }
     }

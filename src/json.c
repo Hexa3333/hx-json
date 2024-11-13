@@ -67,12 +67,12 @@ struct hxjson* hxjson(char* text)
     /* TODO: ERR */
   }
 
-  char keyname[HX_JSON_MAX_KEYLEN] = {0};
+  char keyname[HXJSON_MAX_KEYLEN] = {0};
   struct hxjson_token cToken;
   while ((cToken = GetNextToken(ret)).token)
   {
     /* Get keyname */
-    if (cToken.token == HX_JSON_TOKEN_QUOTE)
+    if (cToken.token == HXJSON_TOKEN_QUOTE)
     {
       int Q1 = cToken.pos;
       int Q2 = (cToken = GetNextToken(ret)).pos;
@@ -80,11 +80,11 @@ struct hxjson* hxjson(char* text)
       strncat(keyname, ret->text + Q1 + 1, innerKeyLen);
       //printf("%s\n", keyname);
 
-      if ((cToken = GetNextToken(ret)).token == HX_JSON_TOKEN_COLON)
+      if ((cToken = GetNextToken(ret)).token == HXJSON_TOKEN_COLON)
       {
         switch ((cToken = GetNextToken(ret)).token)
         {
-          case HX_JSON_TOKEN_QUOTE:
+          case HXJSON_TOKEN_QUOTE:
           {
             Q1 = cToken.pos+1;
             Q2 = (cToken = GetNextToken(ret)).pos -1;
@@ -94,7 +94,7 @@ struct hxjson* hxjson(char* text)
             break;
           }
 
-          case HX_JSON_TOKEN_INT:
+          case HXJSON_TOKEN_INT:
           {
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
@@ -103,7 +103,7 @@ struct hxjson* hxjson(char* text)
             PopPreservekeyname(keyname);
             break;
           }
-          case HX_JSON_TOKEN_FLOAT:
+          case HXJSON_TOKEN_FLOAT:
           {
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
@@ -112,7 +112,7 @@ struct hxjson* hxjson(char* text)
             PopPreservekeyname(keyname);
             break;
           }
-          case HX_JSON_TOKEN_BOOL:
+          case HXJSON_TOKEN_BOOL:
           {
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
@@ -121,7 +121,7 @@ struct hxjson* hxjson(char* text)
             PopPreservekeyname(keyname);
             break;
           }
-          case HX_JSON_TOKEN_NULL:
+          case HXJSON_TOKEN_NULL:
           {
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
@@ -131,10 +131,10 @@ struct hxjson* hxjson(char* text)
             break;
           }
 
-          case HX_JSON_TOKEN_LBRACK:
+          case HXJSON_TOKEN_LBRACK:
           {
             Q1 = cToken.pos;
-            while ((cToken = GetNextToken(ret)).token != HX_JSON_TOKEN_RBRACK) {}
+            while ((cToken = GetNextToken(ret)).token != HXJSON_TOKEN_RBRACK) {}
             Q2 = cToken.pos;
 
             PushValue(keyname, Q1, Q2, ret);
@@ -143,7 +143,7 @@ struct hxjson* hxjson(char* text)
           }
           
 
-          case HX_JSON_TOKEN_LCURLY:
+          case HXJSON_TOKEN_LCURLY:
           {
             strcat(keyname, ".");
             break;
@@ -151,7 +151,7 @@ struct hxjson* hxjson(char* text)
           default: break;
         }
       } 
-    } else if (cToken.token == HX_JSON_TOKEN_RCURLY)
+    } else if (cToken.token == HXJSON_TOKEN_RCURLY)
     {
       Popkeyname(keyname);
     }

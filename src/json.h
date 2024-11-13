@@ -1,14 +1,14 @@
-#ifndef HX_JSON_H
-#define HX_JSON_H
+#ifndef HXJSON_H
+#define HXJSON_H
 
 #include <stdbool.h>
 #include "lexer.h"
 
-#define HX_JSON_MAX_KEYLEN 128
-#define HX_JSON_MAX_VALLEN 64
+#define HXJSON_MAX_KEYLEN 128
+#define HXJSON_MAX_VALLEN 64
 
 struct hxjson_node {
-  char key[HX_JSON_MAX_KEYLEN];
+  char key[HXJSON_MAX_KEYLEN];
   unsigned int Start, End;
   unsigned int index;
 };
@@ -19,7 +19,7 @@ struct hxjson {
   struct hxjson_lexer lexer;
   unsigned int curTokenIndex;
 
-  struct hxjson_node values[HX_JSON_MAX_VALLEN];
+  struct hxjson_node values[HXJSON_MAX_VALLEN];
   unsigned int curValueIndex;
 };
 
@@ -37,4 +37,4 @@ int hxjsonWrite(struct hxjson* json);
 
 void hxjsonFree(struct hxjson* json);
 
-#endif //HX_JSON_H
+#endif //HXJSON_H
