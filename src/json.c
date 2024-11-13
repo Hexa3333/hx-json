@@ -48,7 +48,6 @@ static void PushValue(char* key, unsigned int Q1, unsigned int Q2, struct hxjson
   strcpy(json->nodes[json->curNodeIndex].key, key);
   json->nodes[json->curNodeIndex].Start = Q1;
   json->nodes[json->curNodeIndex].End = Q2;
-  json->nodes[json->curNodeIndex].index = json->curNodeIndex;
   json->curNodeIndex++;
 }
 
@@ -201,20 +200,17 @@ char* hxjsonGet(const char* name, struct hxjson* json)
 */
 
 /* TODO */
-void hxjsonSet(const char* name, struct hxjson* json)
+void hxjsonSet(const char* name, char* value, struct hxjson* json)
 {
   struct hxjson_node* node = hxjsonFindNode(name, json);
   if (!node)
   {
     /* Set new */
-
     /* Write */
   }
   else
   {
     /* Update */
-    PushValue(node->key, node->Start, node->End, json);
-
     /* Write */
   }
 }
@@ -229,6 +225,7 @@ void hxjsonFree(struct hxjson* json)
    The whole api internally works only with strings.
    The strings are converted to the appropriate nodes
   when hxjsonGet{Type} is called.
+
    The input nodes are converted to strings when
   hxJsonSet{Type} is called. (might actually make sets string only)
 
