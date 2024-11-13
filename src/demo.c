@@ -24,10 +24,10 @@ char* read_all(const char* fPath)
 
 int main(void)
 {
-  char* text = read_all("test.json");
+  char* text = read_all("test2.json");
 
   struct hxjson* json = hxjson(text);
-  char* name = hxjsonGet("wfa", json);
+  char* name = hxjsonGet("listy.alo", json);
   printf("%s\n", name);
   free(name);
   

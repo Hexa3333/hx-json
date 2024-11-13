@@ -158,21 +158,50 @@ struct hxjson* hxjson(char* text)
     {
       /* ERROR: missing colon */
     }
-    }
+  }
 
   return ret;
 }
 
-/* TODO: Implement string search */
+/* TODO: Implement hashtable based string search ? */
+static struct hxjson_node* hxjsonFindNode(const char* name, struct hxjson* json)
+{
+  for (int i = 0; i < json->curValueIndex; ++i)
+  {
+    if (strcmp(name, json->values[i].key) == 0)
+    {
+      return &json->values[i];
+    }
+  }
+
+  return NULL;
+}
 
 char* hxjsonGet(const char* name, struct hxjson* json)
 {
-  int valLen = json->values[0].End - json->values[0].Start+1;
+  struct hxjson_node* val = hxjsonFindNode(name, json);
+  if (!val)
+    return "";
+
+  int valLen = val->End - val->Start+1;
   char* ret = malloc(valLen);
-  strncpy(ret, &json->text[json->values[0].Start], valLen);
+  strncpy(ret, &json->text[val->Start], valLen);
   ret[valLen] = 0;
 
   return ret;
+}
+
+void hxjsonSet(const char* name, struct hxjson* json)
+{
+  struct hxjson_node* node = hxjsonFindNode(name, json);
+  if (!node)
+  {
+    /* Update */
+  }
+  else
+  {
+    /* Set new */
+  }
 }
 
 void hxjsonFree(struct hxjson* json)
@@ -186,6 +215,9 @@ void hxjsonFree(struct hxjson* json)
   when hxjsonGet{Type} is called.
    The input values are converted to strings when
   hxJsonSet{Type} is called. (might actually make sets string only)
+
+   You cannot get dictionary values as a whole, but can use the...
+
    This includes arrays. The user has to create a buffer as a string
   and only then pass hxJsonSet.
   Ex:
