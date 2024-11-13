@@ -47,9 +47,9 @@ static void PushValue(char* key, unsigned int Q1, unsigned int Q2, struct hxjson
   strcpy(json->values[json->curValueIndex].key, key);
   json->values[json->curValueIndex].Start = Q1;
   json->values[json->curValueIndex].End = Q2;
+  json->values[json->curValueIndex].index = json->curValueIndex;
   json->curValueIndex++;
 }
-
 
 struct hxjson* hxjson(char* text)
 {
@@ -132,7 +132,7 @@ struct hxjson* hxjson(char* text)
 
           case HX_JSON_TOKEN_LBRACK:
           {
-            Q1 = cToken.pos;            
+            Q1 = cToken.pos;
             while ((cToken = GetNextToken(ret)).token != HX_JSON_TOKEN_RBRACK) {}
             Q2 = cToken.pos;
 
@@ -177,6 +177,9 @@ static struct hxjson_node* hxjsonFindNode(const char* name, struct hxjson* json)
   return NULL;
 }
 
+
+
+
 char* hxjsonGet(const char* name, struct hxjson* json)
 {
   struct hxjson_node* val = hxjsonFindNode(name, json);
@@ -184,7 +187,7 @@ char* hxjsonGet(const char* name, struct hxjson* json)
     return "";
 
   int valLen = val->End - val->Start+1;
-  char* ret = malloc(valLen);
+  char* ret = malloc(valLen+1);
   strncpy(ret, &json->text[val->Start], valLen);
   ret[valLen] = 0;
 
@@ -196,17 +199,23 @@ void hxjsonSet(const char* name, struct hxjson* json)
   struct hxjson_node* node = hxjsonFindNode(name, json);
   if (!node)
   {
-    /* Update */
+    /* Set new */
+
+    /* Write */
   }
   else
   {
-    /* Set new */
+    /* Update */
+    PushValue(node->key, node->Start, node->End, json);
+
+    /* Write */
   }
 }
 
 void hxjsonFree(struct hxjson* json)
 {
   free_lexer(&json->lexer);
+  free(json);
 }
 
 /* 

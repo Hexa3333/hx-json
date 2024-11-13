@@ -10,6 +10,7 @@
 struct hxjson_node {
   char key[HX_JSON_MAX_KEYLEN];
   unsigned int Start, End;
+  unsigned int index;
 };
 
 struct hxjson {
@@ -26,6 +27,8 @@ void hxjsonFree(struct hxjson* json);
 
 /* TODO: API */
 char* hxjsonGet(const char* name, struct hxjson* json);
+
+/* TODO */
 void hxjsonSet(const char* name, struct hxjson* json);
 
 #endif //HX_JSON_H

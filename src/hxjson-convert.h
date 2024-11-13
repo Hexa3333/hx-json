@@ -1,0 +1,6 @@
+#ifndef HXJSON_CONVERT_H
+#define HXJSON_CONVERT_H
+
+
+
+#endif // HXJSON_CONVERT_H

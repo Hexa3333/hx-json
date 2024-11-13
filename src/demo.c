@@ -15,8 +15,9 @@ char* read_all(const char* fPath)
   fseek(fp, 0, SEEK_SET);
 
   /* Load file into memory */
-  char* text = malloc(fileLength);
+  char* text = malloc(fileLength+1);
   fread(text, 1, fileLength, fp);
+  text[fileLength] = 0;
   fclose(fp);
 
   return text;
@@ -24,10 +25,10 @@ char* read_all(const char* fPath)
 
 int main(void)
 {
-  char* text = read_all("test2.json");
+  char* text = read_all("test.json");
 
   struct hxjson* json = hxjson(text);
-  char* name = hxjsonGet("listy.alo", json);
+  char* name = hxjsonGet("hmm", json);
   printf("%s\n", name);
   free(name);
   
