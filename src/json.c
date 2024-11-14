@@ -241,20 +241,11 @@ static int GetKeyDepth(const char* key)
 static char** GetKeyTokenized(const char* key)
 {
   int depth = GetKeyDepth(key);
-  char** ret;
-  if (depth == 0)
+  char** ret = malloc(HXJSON_MAX_KEYLEN * (depth+1));
+  ret[0] = strtok((char*)key, ".");
+  for (int i = 1; i < (depth+1); ++i)
   {
-    ret = malloc(HXJSON_MAX_KEYLEN);
-    strcpy(ret[0], key);
-  }
-  else
-  {
-    ret = malloc(HXJSON_MAX_KEYLEN * (depth+1));
-    ret[0] = strtok((char*)key, ".");
-    for (int i = 1; i < (depth+1); ++i)
-    {
-      ret[i] = strtok(NULL, ".");
-    }
+    ret[i] = strtok(NULL, ".");
   }
 
   return ret;
@@ -265,7 +256,6 @@ int hxjsonWrite(const char* fileName, struct hxjson* json)
   FILE* fp = fopen(fileName, "w");
   fputs("{\n", fp);
   
-  int previousDepth = 0;
   for (int i = 0; i < json->curNodeIndex; ++i)
   {
     /* Plus other symbols ", :, [, ] FIXME*/
@@ -273,20 +263,17 @@ int hxjsonWrite(const char* fileName, struct hxjson* json)
     char* bufP = buf;
     /* TODO: Better syntax (treat arrays differently) */
 
-    char* val = GetValueFromQ(json->nodes[i].Start, json->nodes[i].End, json);
     int depth = GetKeyDepth(json->nodes[i].key);
+    char** keys = GetKeyTokenized(json->nodes[i].key);
+    for (int i = 0; i <= depth; ++i)
+      printf("[%i] -> %s\n", i, keys[i]);
+    printf("-----\n");
 
-    if (depth == 0)
-      bufP += sprintf(bufP, "\"%s\": %s,\n", json->nodes[i].key, val);
-    else
-    {
-      char** keys = GetKeyTokenized(json->nodes[i].key);
-    }
-    
-    previousDepth = depth;
-    free(val);
-    fputs(buf, fp);
+    free(keys);
+
+    //fputs(buf, fp);
   }
+
   fputc('}', fp);
   fclose(fp);
 
