@@ -219,7 +219,15 @@ static char* GetValueFromQ(unsigned int Q1, unsigned int Q2, struct hxjson* json
 {
   char* val = malloc(Q2-Q1+2);
   strncpy(val, json->text + Q1, Q2-Q1+1);
-  val[Q2-Q1+1] = 0;
+
+  /* The needed truncation for a last element in a dictionary */
+  /* TODO: MOVE / Smarter */
+  char* valEnd = &val[Q2-Q1+1];
+  while (*(valEnd-1) == ' ')
+  {
+    valEnd -= 1;
+  }
+  *valEnd = 0;
 
   return val;
 }
@@ -265,13 +273,15 @@ int hxjsonWrite(const char* fileName, struct hxjson* json)
 
     int depth = GetKeyDepth(json->nodes[i].key);
     char** keys = GetKeyTokenized(json->nodes[i].key);
-    for (int i = 0; i <= depth; ++i)
-      printf("[%i] -> %s\n", i, keys[i]);
-    printf("-----\n");
+
+    char* val = GetValueFromQ(json->nodes[i].Start, json->nodes[i].End, json);
+    bufP += sprintf(bufP, "\"%s\": %s\n", keys[0], val);
+
+    free(val);
 
     free(keys);
 
-    //fputs(buf, fp);
+    fputs(buf, fp);
   }
 
   fputc('}', fp);
