@@ -85,8 +85,8 @@ struct hxjson* hxjson(char* text)
         {
           case HXJSON_TOKEN_QUOTE:
           {
-            Q1 = cToken.pos+1;
-            Q2 = (cToken = GetNextToken(ret)).pos -1;
+            Q1 = cToken.pos;
+            Q2 = (cToken = GetNextToken(ret)).pos;
             PushValue(keyname, Q1, Q2, ret);
 
             PopPreservekeyname(keyname);
@@ -213,6 +213,84 @@ void hxjsonSet(const char* name, char* value, struct hxjson* json)
     /* Update */
     /* Write */
   }
+}
+
+static char* GetValueFromQ(unsigned int Q1, unsigned int Q2, struct hxjson* json)
+{
+  char* val = malloc(Q2-Q1+2);
+  strncpy(val, json->text + Q1, Q2-Q1+1);
+  val[Q2-Q1+1] = 0;
+
+  return val;
+}
+
+static int GetKeyDepth(const char* key)
+{
+  char* found;
+  int depth = 0;
+  int keyLen = strlen(key);
+  for (int i = 0; i < keyLen; ++i)
+  {
+    if (key[i] == '.')
+      ++depth;
+  }
+
+  return depth;
+}
+
+static char** GetKeyTokenized(const char* key)
+{
+  int depth = GetKeyDepth(key);
+  char** ret;
+  if (depth == 0)
+  {
+    ret = malloc(HXJSON_MAX_KEYLEN);
+    strcpy(ret[0], key);
+  }
+  else
+  {
+    ret = malloc(HXJSON_MAX_KEYLEN * (depth+1));
+    ret[0] = strtok((char*)key, ".");
+    for (int i = 1; i < (depth+1); ++i)
+    {
+      ret[i] = strtok(NULL, ".");
+    }
+  }
+
+  return ret;
+}
+
+int hxjsonWrite(const char* fileName, struct hxjson* json)
+{
+  FILE* fp = fopen(fileName, "w");
+  fputs("{\n", fp);
+  
+  int previousDepth = 0;
+  for (int i = 0; i < json->curNodeIndex; ++i)
+  {
+    /* Plus other symbols ", :, [, ] FIXME*/
+    char buf[HXJSON_MAX_KEYLEN+1024] = {0};
+    char* bufP = buf;
+    /* TODO: Better syntax (treat arrays differently) */
+
+    char* val = GetValueFromQ(json->nodes[i].Start, json->nodes[i].End, json);
+    int depth = GetKeyDepth(json->nodes[i].key);
+
+    if (depth == 0)
+      bufP += sprintf(bufP, "\"%s\": %s,\n", json->nodes[i].key, val);
+    else
+    {
+      char** keys = GetKeyTokenized(json->nodes[i].key);
+    }
+    
+    previousDepth = depth;
+    free(val);
+    fputs(buf, fp);
+  }
+  fputc('}', fp);
+  fclose(fp);
+
+  return 0;
 }
 
 void hxjsonFree(struct hxjson* json)

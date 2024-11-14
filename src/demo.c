@@ -29,9 +29,6 @@ int main(void)
   char* text = read_all("test.json");
 
   struct hxjson* json = hxjson(text);
-  char* get = hxjsonGet("address.coordinates.latitude", json);
-  printf("%s\n", get);
-  if (get) free(get);
 
   char* name2 = hxjsonGet("name2", json);
   char* name3 = hxjsonGet("name3", json);
@@ -39,9 +36,12 @@ int main(void)
 
   printf("%s %s, Bounty: %li\n", name2, name3, strtol(bounty, NULL, 0));
 
-  free(name2);  
-  free(name3);  
-  free(bounty);  
+  free(name2);
+  free(name3);
+  free(bounty);
+
+  hxjsonWrite("out.json", json);
+
   hxjsonFree(json);
   free(text);
   
