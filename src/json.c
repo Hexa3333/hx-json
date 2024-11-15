@@ -262,6 +262,9 @@ static char** GetKeyTokenized(const char* key)
 /* (FIXME?) Looks good enough idk */
 static int GetKeySiblingUpto(char** key1, char** key2)
 {
+  if (key1 == NULL || key2 == NULL)
+    return 0;
+
   int i = 0;
   for (; key1[i] && key2[i]; ++i)
   {
@@ -288,11 +291,10 @@ int hxjsonWrite(const char* fileName, struct hxjson* json)
     /* TODO: Confusing a little */
     int depth = GetKeyDepth(json->nodes[i].key);
     key = GetKeyTokenized(json->nodes[i].key);
-    if (i > 0)
-      printf("(%s, %s): %i\n", json->nodes[i].key, json->nodes[i-1].key, GetKeySiblingUpto(key, prev_key));
 
     if (depth == lastDepth)
     {
+      GetKeySiblingUpto(key, prev_key);
     }
     else if (depth > lastDepth)
     {
