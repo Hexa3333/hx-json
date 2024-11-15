@@ -259,30 +259,57 @@ static char** GetKeyTokenized(const char* key)
   return ret;
 }
 
+/* (FIXME?) Looks good enough idk */
+static int GetKeySiblingUpto(char** key1, char** key2)
+{
+  int i = 0;
+  for (; key1[i] && key2[i]; ++i)
+  {
+    if (strcmp(key1[i], key2[i]))
+      break;
+  }
+
+  return i;
+}
+
 int hxjsonWrite(const char* fileName, struct hxjson* json)
 {
   FILE* fp = fopen(fileName, "w");
   fputs("{\n", fp);
-  
+
+  char **key, **prev_key=NULL;
+  int lastDepth = 0;
   for (int i = 0; i < json->curNodeIndex; ++i)
   {
     /* Plus other symbols ", :, [, ] FIXME*/
     char buf[HXJSON_MAX_KEYLEN+1024] = {0};
-    char* bufP = buf;
-    /* TODO: Better syntax (treat arrays differently) */
+    char* bufp = buf;
 
+    /* TODO: Confusing a little */
     int depth = GetKeyDepth(json->nodes[i].key);
-    char** keys = GetKeyTokenized(json->nodes[i].key);
+    key = GetKeyTokenized(json->nodes[i].key);
+    if (i > 0)
+      printf("(%s, %s): %i\n", json->nodes[i].key, json->nodes[i-1].key, GetKeySiblingUpto(key, prev_key));
 
-    char* val = GetValueFromQ(json->nodes[i].Start, json->nodes[i].End, json);
-    bufP += sprintf(bufP, "\"%s\": %s\n", keys[0], val);
+    if (depth == lastDepth)
+    {
+    }
+    else if (depth > lastDepth)
+    {
+    }
+    else // depth < lastDepth
+    {
+    }
 
-    free(val);
 
-    free(keys);
 
+    if (prev_key) free(prev_key);
+    prev_key = key;
+    lastDepth = depth;
     fputs(buf, fp);
   }
+
+  free(key);
 
   fputc('}', fp);
   fclose(fp);
