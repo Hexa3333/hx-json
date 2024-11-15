@@ -282,6 +282,7 @@ int hxjsonWrite(const char* fileName, struct hxjson* json)
 
   char **key, **prev_key=NULL;
   int lastDepth = 0;
+  int lastSimilarity = 0;
   for (int i = 0; i < json->curNodeIndex; ++i)
   {
     /* Plus other symbols ", :, [, ] FIXME*/
@@ -291,23 +292,46 @@ int hxjsonWrite(const char* fileName, struct hxjson* json)
     /* TODO: Confusing a little */
     int depth = GetKeyDepth(json->nodes[i].key);
     key = GetKeyTokenized(json->nodes[i].key);
+    int similarity = GetKeySiblingUpto(key, prev_key);
 
-    if (depth == lastDepth)
+    if (lastSimilarity - similarity > 0)
     {
-      GetKeySiblingUpto(key, prev_key);
-    }
-    else if (depth > lastDepth)
-    {
-    }
-    else // depth < lastDepth
-    {
+      for (int tab = 0; tab <= depth; ++tab)
+        bufp += sprintf(bufp, "\t");
+
+      bufp += sprintf(bufp, "},\n");
     }
 
+    if (similarity)
+    {
+      char* val = GetValueFromQ(json->nodes[i].Start, json->nodes[i].End, json);
+      for (int tab = 0; tab <= similarity; ++tab)
+        bufp += sprintf(bufp, "\t");
+
+      bufp += sprintf(bufp, "\"%s\": %s,\n", key[depth], val);
+
+      free(val);
+    }
+    else
+    {
+      char* val = GetValueFromQ(json->nodes[i].Start, json->nodes[i].End, json);
+      for (int d = 0; d <= depth; ++d)
+      {
+        for (int tab = 0; tab <= d; ++tab)
+          bufp += sprintf(bufp, "\t");
+        if (d == depth)
+          bufp += sprintf(bufp, "\"%s\": %s,\n", key[d], val);
+        else
+          bufp += sprintf(bufp, "\"%s\": {\n", key[d]);
+      }
+      free(val);
+    }
 
 
     if (prev_key) free(prev_key);
     prev_key = key;
     lastDepth = depth;
+    lastSimilarity = similarity;
     fputs(buf, fp);
   }
 

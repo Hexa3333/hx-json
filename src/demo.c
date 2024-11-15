@@ -41,9 +41,23 @@ int main(void)
   free(bounty);
 
   hxjsonWrite("out.json", json);
+  char* text2 = read_all("out.json");
+  struct hxjson* json2 = hxjson(text2);
+
+  name2 = hxjsonGet("name2", json2);
+  name3 = hxjsonGet("name3", json2);
+  bounty = hxjsonGet("bounty", json2);
+
+  printf("%s %s, Bounty: %li\n", name2, name3, strtol(bounty, NULL, 0));
+
+  free(name2);
+  free(name3);
+  free(bounty);
 
   hxjsonFree(json);
+  hxjsonFree(json2);
   free(text);
+  free(text2);
   
   return 0;
 }
