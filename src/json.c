@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <ctype.h>
 
 static struct hxjson_token GetNextToken(struct hxjson* json)
 {
@@ -87,8 +88,10 @@ struct hxjson* hxjson(char* text)
           {
             Q1 = cToken.pos;
             Q2 = (cToken = GetNextToken(ret)).pos;
-            PushValue(keyname, Q1, Q2, ret);
 
+            for (; text[Q2] == ' ' || text[Q2] == '\n'; Q2--);
+
+            PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
           }
@@ -97,6 +100,8 @@ struct hxjson* hxjson(char* text)
           {
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
+
+            for (; text[Q2] == ' ' || text[Q2] == '\n'; Q2--);
 
             PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
@@ -107,6 +112,14 @@ struct hxjson* hxjson(char* text)
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
 
+            for (; text[Q2] == ' ' || text[Q2] == '\n'; Q2--);
+            
+            // Test truncation:
+            //char printbuf[32];
+            //strncpy(printbuf, text+Q1, Q2-Q1+1);
+            //printbuf[Q2-Q1+1] = 0;
+            //printf("(%i, %i):%s\n", Q1, Q2, printbuf);
+
             PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
@@ -116,6 +129,8 @@ struct hxjson* hxjson(char* text)
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
 
+            for (; text[Q2] == ' ' || text[Q2] == '\n'; Q2--);
+
             PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
             break;
@@ -124,6 +139,8 @@ struct hxjson* hxjson(char* text)
           {
             Q1 = cToken.pos;
             Q2 = PeekNextToken(ret).pos-1;
+
+            for (; text[Q2] == ' ' || text[Q2] == '\n'; Q2--);
 
             PushValue(keyname, Q1, Q2, ret);
             PopPreservekeyname(keyname);
