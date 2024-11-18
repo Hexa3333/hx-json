@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "json.h"
+#include "hxjson-convert.h"
 
 char* read_all(const char* fPath)
 {
@@ -30,8 +31,8 @@ int main(void)
 
   struct hxjson* json = hxjson(text);
 
-  char* name2 = hxjsonGet("name2", json);
-  char* name3 = hxjsonGet("name3", json);
+  char* name2 = hxjsonGetString("name2", json);
+  char* name3 = hxjsonGetString("name3", json);
   char* bounty = hxjsonGet("bounty", json);
 
   printf("%s %s, Bounty: %li\n", name2, name3, strtol(bounty, NULL, 0));
