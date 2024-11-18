@@ -45,7 +45,7 @@ hxjsonBool hxjsonGetBool(char* key, struct hxjson* json)
 
   // Bool conversion logic
   hxjsonBool ret;
-  if (strcmp(valStr, "true"))
+  if (strcmp(valStr, "true") == 0)
     ret = true;
   else
     ret = false;
