@@ -33,27 +33,27 @@ int main(void)
 
   char* name2 = hxjsonGetString("name2", json);
   char* name3 = hxjsonGetString("name3", json);
-  char* bounty = hxjsonGet("bounty", json);
+  float actualAge = hxjsonGetFloat("actualAge", json);
+  int bounty = hxjsonGetInt("bounty", json);
 
-  printf("%s %s, Bounty: %li\n", name2, name3, strtol(bounty, NULL, 0));
+  printf("%s %s, (%.2f), Bounty: %i\n", name2, name3, actualAge, bounty);
 
   free(name2);
   free(name3);
-  free(bounty);
 
   hxjsonWrite("out.json", json);
   char* text2 = read_all("out.json");
   struct hxjson* json2 = hxjson(text2);
 
-  name2 = hxjsonGet("name2", json2);
-  name3 = hxjsonGet("name3", json2);
-  bounty = hxjsonGet("bounty", json2);
+  name2 = hxjsonGetString("name2", json2);
+  name3 = hxjsonGetString("name3", json2);
+  bounty = hxjsonGetInt("bounty", json2);
 
-  printf("%s %s, Bounty: %li\n", name2, name3, strtol(bounty, NULL, 0));
+  printf("%s %s, Bounty: %i\n", name2, name3, bounty);
+  printf("stillworkd: %i\n", hxjsonGetBool("stillworks", json));
 
   free(name2);
   free(name3);
-  free(bounty);
 
   hxjsonFree(json);
   hxjsonFree(json2);

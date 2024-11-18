@@ -201,7 +201,7 @@ char* hxjsonGet(const char* name, struct hxjson* json)
 {
   struct hxjson_node* val = hxjsonFindNode(name, json);
   if (!val)
-    return "";
+    return NULL;
 
   int valLen = val->End - val->Start+1;
   char* ret = malloc(valLen+1);
