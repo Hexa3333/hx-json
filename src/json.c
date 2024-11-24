@@ -213,11 +213,6 @@ char* hxjsonGet(const char* name, struct hxjson* json)
   return ret;
 }
 
-/* NOTE: 
-  Set calls work in-memory and are only written after
- a call to hxjsonWrite
-*/
-
 /* This is modifying text every modification.
  * TODO: Stage changes to be merged */
 void hxjsonSet(const char* name, char* value, struct hxjson* json)
@@ -226,39 +221,42 @@ void hxjsonSet(const char* name, char* value, struct hxjson* json)
   struct hxjson_node* node = hxjsonFindNode(name, &nodeIndex, json);
   if (!node)
   {
-    /* Set new */
-    /* Write */
+    /* Write, last entry */
   }
   else
   {
-    /* Update */
-    /* Write */
-    // LOGIC:
-    // RESIZE THE TEXT
+    /* Write, fixing offsets */
     size_t textLen = strlen(json->text);
     size_t valLen = strlen(value);
     size_t oldValLen = node->End - node->Start+1;
 
-    // Copy everything that comes after new value in a buffer
-    // write the new value from node->Start
-    // update node->End
-    // copy everything back into text
-    // rerun hxjson
-    // How to dynamically resize text ?
-
-    // copy everything
-    char* aftercopy = malloc(textLen - node->End);
+    // Copy everything that comes after the about to be
+    // modified value in a buffer
+    char* aftercopy = malloc(textLen - node->End+1);
     strcpy(aftercopy, &json->text[node->End+1]);
 
-    // textLen = textLen +valLen -oldValLen
-    textLen = textLen + valLen - oldValLen;
+    // Calculate the size difference between the old value
+    // and the new for offsets
+    int diff = valLen - oldValLen;
+    textLen += diff;
+    node->End += diff;
 
-    json->text = realloc(json->text, textLen);
+    // Adjust size of text and copy the new value, possibly
+    // overwriting others
+    json->text = realloc(json->text, textLen+1);
     strncpy(&json->text[node->Start], value, valLen);
-    node->End = node->Start + valLen;
-    strcpy(&json->text[node->End], aftercopy);
+
+    // Write the aftercopy after the new value
+    strcpy(&json->text[node->End+1], aftercopy);
 
     free(aftercopy);
+
+    // Update the offsets of the following nodes
+    for (int i = nodeIndex+1; i < json->curNodeIndex; ++i)
+    {
+      json->nodes[i].Start += diff;
+      json->nodes[i].End += diff;
+    }
   }
 }
 
