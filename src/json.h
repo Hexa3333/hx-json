@@ -32,4 +32,4 @@ void hxjsonSet(const char* name, char* value, struct hxjson* json);
 int hxjsonWrite(const char* fileName, struct hxjson* json);
 void hxjsonFree(struct hxjson* json);
 
-#endif //HXJSON_H
+#endif // HXJSON_H

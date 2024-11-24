@@ -187,7 +187,8 @@ static struct hxjson_node* hxjsonFindNode(const char* name, unsigned int* index,
   {
     if (strcmp(name, json->nodes[i].key) == 0)
     {
-      *index = i;
+      if (index)
+        *index = i;
       return &json->nodes[i];
     }
   }
@@ -232,6 +233,32 @@ void hxjsonSet(const char* name, char* value, struct hxjson* json)
   {
     /* Update */
     /* Write */
+    // LOGIC:
+    // RESIZE THE TEXT
+    size_t textLen = strlen(json->text);
+    size_t valLen = strlen(value);
+    size_t oldValLen = node->End - node->Start+1;
+
+    // Copy everything that comes after new value in a buffer
+    // write the new value from node->Start
+    // update node->End
+    // copy everything back into text
+    // rerun hxjson
+    // How to dynamically resize text ?
+
+    // copy everything
+    char* aftercopy = malloc(textLen - node->End);
+    strcpy(aftercopy, &json->text[node->End+1]);
+
+    // textLen = textLen +valLen -oldValLen
+    textLen = textLen + valLen - oldValLen;
+
+    json->text = realloc(json->text, textLen);
+    strncpy(&json->text[node->Start], value, valLen);
+    node->End = node->Start + valLen;
+    strcpy(&json->text[node->End], aftercopy);
+
+    free(aftercopy);
   }
 }
 

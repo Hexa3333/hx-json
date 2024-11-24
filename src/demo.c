@@ -27,20 +27,20 @@ char* read_all(const char* fPath)
 
 int main(void)
 {
-  char* text = read_all("test.json");
-
+  char* text = read_all("test2.json");
   struct hxjson* json = hxjson(text);
 
-  char* name2 = hxjsonGetString("name2", json);
-  char* name3 = hxjsonGetString("name3", json);
-  float actualAge = hxjsonGetFloat("actualAge", json);
-  int bounty = hxjsonGetInt("bounty", json);
+  FILE* fpOut = fopen("out.json", "w");
+  if (!fpOut) return -1;
 
-  printf("%s %s, (%.2f), Bounty: %i\n", name2, name3, actualAge, bounty);
+  hxjsonSet("listy.dedim", "13169", json);
+  hxjsonSet("listy.alo", "5000", json);
 
-  free(name2);
-  free(name3);
+  fprintf(fpOut, "%s", json->text);
+  fclose(fpOut);
 
+  return 0;
+#if 0
   hxjsonWrite("out.json", json);
   char* text2 = read_all("out.json");
   struct hxjson* json2 = hxjson(text2);
@@ -61,4 +61,5 @@ int main(void)
   free(text2);
   
   return 0;
+#endif
 }
