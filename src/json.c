@@ -181,12 +181,13 @@ struct hxjson* hxjson(char* text)
 }
 
 /* TODO: Implement hashtable based string search ? */
-static struct hxjson_node* hxjsonFindNode(const char* name, struct hxjson* json)
+static struct hxjson_node* hxjsonFindNode(const char* name, unsigned int* index, struct hxjson* json)
 {
   for (int i = 0; i < json->curNodeIndex; ++i)
   {
     if (strcmp(name, json->nodes[i].key) == 0)
     {
+      *index = i;
       return &json->nodes[i];
     }
   }
@@ -199,7 +200,7 @@ static struct hxjson_node* hxjsonFindNode(const char* name, struct hxjson* json)
 /* TODO: Smart get (array implementation)*/
 char* hxjsonGet(const char* name, struct hxjson* json)
 {
-  struct hxjson_node* val = hxjsonFindNode(name, json);
+  struct hxjson_node* val = hxjsonFindNode(name, NULL, json);
   if (!val)
     return NULL;
 
@@ -216,10 +217,12 @@ char* hxjsonGet(const char* name, struct hxjson* json)
  a call to hxjsonWrite
 */
 
-/* TODO */
+/* This is modifying text every modification.
+ * TODO: Stage changes to be merged */
 void hxjsonSet(const char* name, char* value, struct hxjson* json)
 {
-  struct hxjson_node* node = hxjsonFindNode(name, json);
+  unsigned int nodeIndex;
+  struct hxjson_node* node = hxjsonFindNode(name, &nodeIndex, json);
   if (!node)
   {
     /* Set new */
