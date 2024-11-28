@@ -1,4 +1,5 @@
 #include "hxjson-convert.h"
+#include "json.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -75,3 +76,38 @@ hxjsonBool hxjsonGetBool(char* key, struct hxjson* json)
   free(valStr);
   return ret;
 }
+
+char* hxjsonGetArrElement(char* key, int index, struct hxjson* json)
+{
+  char* whole = hxjsonGet(key, json);
+  char *pStart = whole+1, *pEnd = strchr(whole, ',');
+
+  // Get the , , range
+  for (int i = 0; pEnd && i != index; ++i)
+  {
+    ++pEnd;
+    pStart = pEnd;
+    pEnd = strchr(pEnd, ',');
+  }
+
+  if (pEnd == NULL) pEnd = pStart + strlen(pStart)-1;
+
+  char* ret = malloc(pEnd - pStart +1);
+  strncpy(ret, pStart, pEnd-pStart);
+  ret[pEnd-pStart] = 0;
+
+  free(whole);
+  return ret;
+}
+
+char* hxjsonGetArrString(char* key, int index, struct hxjson* json);
+hxjsonInt hxjsonGetArrInt(char* key, int index, struct hxjson* json)
+{
+  char* valStr = hxjsonGetArrElement(key, index, json);
+  hxjsonInt ret = Convert_Integer(valStr);
+  
+  free(valStr);
+  return ret;
+}
+hxjsonFloat hxjsonGetArrFloat(char* key, int index, struct hxjson* json);
+hxjsonBool hxjsonGetArrBool(char* key, int index, struct hxjson* json);

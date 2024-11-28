@@ -19,4 +19,14 @@ hxjsonFloat hxjsonGetFloat(char* key, struct hxjson* json);
 hxjsonBool hxjsonGetBool(char* key, struct hxjson* json);
 
 
+// Gets the value of key[index], converts it to string (0 if not found)
+char* hxjsonGetArrString(char* key, int index, struct hxjson* json);
+// Gets the value of key[index], converts it to hxjsonInt (0 if not found)
+hxjsonInt hxjsonGetArrInt(char* key, int index, struct hxjson* json);
+// Gets the value of key[index], converts it to hxjsonFloat (0 if not found)
+hxjsonFloat hxjsonGetArrFloat(char* key, int index, struct hxjson* json);
+// Gets the value of key[index], converts it to hxjsonBool (0 if not found)
+hxjsonBool hxjsonGetArrBool(char* key, int index, struct hxjson* json);
+
+
 #endif // HXJSON_CONVERT_H
