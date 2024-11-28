@@ -3,19 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <stdio.h>
 static void Convert_String(char* val)
 {
-  printf("previous val: %s\n", val);
-  
   char *pStart = strchr(val, '\"')+1;
   char *pEnd = strrchr(val, '\"')-1;
   int len = pEnd-pStart+1;
 
   memmove(val, pStart, len);
   val[len] = 0;
-
-  printf("new val: %s\n", val);
 }
 
 static hxjsonInt Convert_Integer(char* val)
@@ -123,5 +118,22 @@ hxjsonInt hxjsonGetArrInt(char* key, int index, struct hxjson* json)
   free(valStr);
   return ret;
 }
-hxjsonFloat hxjsonGetArrFloat(char* key, int index, struct hxjson* json);
-hxjsonBool hxjsonGetArrBool(char* key, int index, struct hxjson* json);
+
+#include <stdio.h>
+hxjsonFloat hxjsonGetArrFloat(char* key, int index, struct hxjson* json)
+{
+  char* valStr = hxjsonGetArrElement(key, index, json);
+  hxjsonFloat ret = Convert_Float(valStr);
+  
+  free(valStr);
+  return ret;
+}
+
+hxjsonBool hxjsonGetArrBool(char* key, int index, struct hxjson* json)
+{
+  char* valStr = hxjsonGetArrElement(key, index, json);
+  hxjsonBool ret = Convert_Boolean(valStr);
+  
+  free(valStr);
+  return ret;
+}
