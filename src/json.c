@@ -213,6 +213,29 @@ char* hxjsonGet(const char* name, struct hxjson* json)
   return ret;
 }
 
+char* hxjsonGetArr(char* key, int index, struct hxjson* json)
+{
+  char* whole = hxjsonGet(key, json);
+  char *pStart = whole+1, *pEnd = strchr(whole, ',');
+
+  // Get the , , range
+  for (int i = 0; pEnd && i != index; ++i)
+  {
+    ++pEnd;
+    pStart = pEnd;
+    pEnd = strchr(pEnd, ',');
+  }
+
+  if (pEnd == NULL) pEnd = pStart + strlen(pStart)-1;
+
+  char* ret = malloc(pEnd - pStart +1);
+  strncpy(ret, pStart, pEnd-pStart);
+  ret[pEnd-pStart] = 0;
+
+  free(whole);
+  return ret;
+}
+
 /* This is modifying text every modification.
  * TODO: Stage changes to be merged */
 void hxjsonSet(const char* name, char* value, struct hxjson* json)

@@ -80,39 +80,16 @@ hxjsonBool hxjsonGetBool(char* key, struct hxjson* json)
   return ret;
 }
 
-char* hxjsonGetArrElement(char* key, int index, struct hxjson* json)
-{
-  char* whole = hxjsonGet(key, json);
-  char *pStart = whole+1, *pEnd = strchr(whole, ',');
-
-  // Get the , , range
-  for (int i = 0; pEnd && i != index; ++i)
-  {
-    ++pEnd;
-    pStart = pEnd;
-    pEnd = strchr(pEnd, ',');
-  }
-
-  if (pEnd == NULL) pEnd = pStart + strlen(pStart)-1;
-
-  char* ret = malloc(pEnd - pStart +1);
-  strncpy(ret, pStart, pEnd-pStart);
-  ret[pEnd-pStart] = 0;
-
-  free(whole);
-  return ret;
-}
-
 char* hxjsonGetArrString(char* key, int index, struct hxjson* json)
 {
-  char* valStr = hxjsonGetArrElement(key, index, json);
+  char* valStr = hxjsonGetArr(key, index, json);
   Convert_String(valStr);
   return valStr;
 }
 
 hxjsonInt hxjsonGetArrInt(char* key, int index, struct hxjson* json)
 {
-  char* valStr = hxjsonGetArrElement(key, index, json);
+  char* valStr = hxjsonGetArr(key, index, json);
   hxjsonInt ret = Convert_Integer(valStr);
   
   free(valStr);
@@ -122,7 +99,7 @@ hxjsonInt hxjsonGetArrInt(char* key, int index, struct hxjson* json)
 #include <stdio.h>
 hxjsonFloat hxjsonGetArrFloat(char* key, int index, struct hxjson* json)
 {
-  char* valStr = hxjsonGetArrElement(key, index, json);
+  char* valStr = hxjsonGetArr(key, index, json);
   hxjsonFloat ret = Convert_Float(valStr);
   
   free(valStr);
@@ -131,7 +108,7 @@ hxjsonFloat hxjsonGetArrFloat(char* key, int index, struct hxjson* json)
 
 hxjsonBool hxjsonGetArrBool(char* key, int index, struct hxjson* json)
 {
-  char* valStr = hxjsonGetArrElement(key, index, json);
+  char* valStr = hxjsonGetArr(key, index, json);
   hxjsonBool ret = Convert_Boolean(valStr);
   
   free(valStr);

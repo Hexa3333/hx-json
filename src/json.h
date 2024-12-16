@@ -28,6 +28,7 @@ struct hxjson {
 
 struct hxjson* hxjson(char* text);
 char* hxjsonGet(const char* name, struct hxjson* json);
+char* hxjsonGetArr(char* key, int index, struct hxjson* json);
 void hxjsonSet(const char* name, char* value, struct hxjson* json);
 int hxjsonWrite(const char* fileName, struct hxjson* json);
 void hxjsonFree(struct hxjson* json);
